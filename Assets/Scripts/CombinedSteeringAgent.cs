@@ -24,6 +24,8 @@ public class CombinedSteeringAgent : AbstractSteeringAgent
     private Sphere[] staticObstacles;
     private CombinedSteeringAgent[] otherAgents;
     private int currentPathNode = 0;
+    private Vector3[] points;
+    private bool back = false;
 
     // The AI agent can be considered a sphere
     // with center at "Position" and radius equal to this property
@@ -51,6 +53,32 @@ public class CombinedSteeringAgent : AbstractSteeringAgent
         //      Use "pathToFollow.GetPathVertices()" to access the points of the path.
         //      Variables "staticObstacles" and "otherAgents" contain information about obstacles to avoid, and agents to avoid.
         //      However, your solution does not necessarily have to use these arrays – but they are here to help you in case of need.
+        
+        points = pathToFollow.GetPathVertices();
+        Vector3 targetPosition = points[currentPathNode];
+        if (currentPathNode == 0)
+        {
+            back = false;
+        }
+        if (currentPathNode == points.Length - 1)
+        {
+            back = true;
+        }
+        
+        if (Vector3.Distance(targetPosition, Position) < 0.1)
+        {
+            if (back)
+            {
+                currentPathNode -= 1;
+            }
+            else
+            {
+                currentPathNode += 1;
+            }
+        }
+        targetPosition = points[currentPathNode];
+        SetRotationImmediate(targetPosition - Position);
+        Velocity = LookDirection * maxSpeed;
     }
 
     protected override void LateUpdate()
