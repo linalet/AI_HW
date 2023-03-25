@@ -4,6 +4,13 @@ using UnityEngine;
 
 public class WanderingSteeringAgent : AbstractSteeringAgent
 {
+    [SerializeField]
+    private float wanderRate = 4.5f;
+    [SerializeField]
+    private float wanderOffset = 1.5f;
+    [SerializeField]
+    private float wanderRadius = 4f;
+    private float wanderOrientation = 0f;
     protected override void Awake()
     {
         base.Awake();
@@ -28,6 +35,22 @@ public class WanderingSteeringAgent : AbstractSteeringAgent
         //      Example code:
         //      SetRotationTransition(Vector3.right); // SetRotationImmediate(Vector3.right)
         //      Velocity = LookDirection * maxSpeed;
+        Vector3 targetPosition = Vector3.forward;
+
+        if (DistanceToBounds() < 1.25f)
+        {
+            targetPosition = -Position;
+        }
+        else
+        {
+            wanderOrientation += (Random.value - Random.value) * wanderRate;
+            Vector3 targetOrientation = new Vector3(Mathf.Cos(wanderOrientation), 0,  Mathf.Sin(wanderOrientation)) +  LookDirection;
+            targetPosition = Position + (wanderOffset * LookDirection);
+            targetPosition += wanderRadius * targetOrientation;
+        }
+
+        SetRotationTransition(targetPosition);
+        Velocity = LookDirection * maxSpeed;
     }
 
     protected override void LateUpdate()
