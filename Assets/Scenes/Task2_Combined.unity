@@ -450,9 +450,24 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7589714865748495017, guid: eead72cf60d7fbc40b98ff8b97ada229,
         type: 3}
+      propertyPath: lookahead
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7589714865748495017, guid: eead72cf60d7fbc40b98ff8b97ada229,
+        type: 3}
       propertyPath: pathToFollow
       value: 
       objectReference: {fileID: 1403352754}
+    - target: {fileID: 7589714865748495017, guid: eead72cf60d7fbc40b98ff8b97ada229,
+        type: 3}
+      propertyPath: avoidDistance
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7589714865748495017, guid: eead72cf60d7fbc40b98ff8b97ada229,
+        type: 3}
+      propertyPath: sideViewAngle
+      value: 45
+      objectReference: {fileID: 0}
     - target: {fileID: 7589714865748495017, guid: eead72cf60d7fbc40b98ff8b97ada229,
         type: 3}
       propertyPath: movementBounds
