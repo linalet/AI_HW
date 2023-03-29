@@ -255,7 +255,17 @@ PrefabInstance:
     - target: {fileID: 2038400370829236456, guid: 1082272d6492f414f95a9e79ff49bf35,
         type: 3}
       propertyPath: wanderRate
-      value: 4.5
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 2038400370829236456, guid: 1082272d6492f414f95a9e79ff49bf35,
+        type: 3}
+      propertyPath: wanderOffset
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2038400370829236456, guid: 1082272d6492f414f95a9e79ff49bf35,
+        type: 3}
+      propertyPath: wanderRadius
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 2038400370829236456, guid: 1082272d6492f414f95a9e79ff49bf35,
         type: 3}
