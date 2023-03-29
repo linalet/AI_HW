@@ -433,6 +433,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Agent 1
       objectReference: {fileID: 0}
+    - target: {fileID: 2591338158103953613, guid: eead72cf60d7fbc40b98ff8b97ada229,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7589714865748495017, guid: eead72cf60d7fbc40b98ff8b97ada229,
         type: 3}
       propertyPath: color.b
@@ -737,6 +742,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Agent 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2591338158103953613, guid: eead72cf60d7fbc40b98ff8b97ada229,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7589714865748495017, guid: eead72cf60d7fbc40b98ff8b97ada229,
         type: 3}
@@ -1200,6 +1210,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Agent 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 2591338158103953613, guid: eead72cf60d7fbc40b98ff8b97ada229,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7589714865748495017, guid: eead72cf60d7fbc40b98ff8b97ada229,
         type: 3}
@@ -2208,6 +2223,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Agent 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 2591338158103953613, guid: eead72cf60d7fbc40b98ff8b97ada229,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7589714865748495017, guid: eead72cf60d7fbc40b98ff8b97ada229,
         type: 3}
