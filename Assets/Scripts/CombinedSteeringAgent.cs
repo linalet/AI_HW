@@ -147,11 +147,44 @@ public class CombinedSteeringAgent : AbstractSteeringAgent
             if (curDist < closestDist)
             {
                 closestDist = curDist;
-                if (curDist < 3*(agent.Radius + Radius))
+                if (curDist < 2*(agent.Radius + Radius))
                     closest = agent;
             }
         }
         return closest;
+    }
+    private Vector3 CollisionAvoidance()
+    {
+        Vector3 target = Vector3.zero;
+
+        CombinedSteeringAgent agent = GetClosestAgent();
+        if (agent == null)
+            return target;
+
+        Vector3 relativePos = Position - agent.Position;
+        Vector3 relativeVel = (LookDirection - agent.LookDirection);
+        float distance = relativePos.magnitude;
+        float relativeSpeed = relativeVel.magnitude;
+        if (relativeSpeed == 0)
+            return target;
+
+        float timeToCollision = -1 * Vector3.Dot(relativePos, relativeVel) / (relativeSpeed * relativeSpeed);
+
+        Vector3 separation = relativePos + relativeVel * timeToCollision;
+        float minSeparation = separation.magnitude;
+
+        if (minSeparation > Radius + agent.Radius)
+            return target;
+
+        if ((timeToCollision < 0))
+            return target;
+
+        if (minSeparation <= 0 || distance < Radius + agent.Radius)
+            target = Position - agent.Position;
+        else
+            target = relativePos + relativeVel * timeToCollision;
+
+        return target;
     }
     private Vector3 ObstacleAvoidance()
     {
@@ -172,68 +205,6 @@ public class CombinedSteeringAgent : AbstractSteeringAgent
             }
             Debug.DrawRay(Position, rayVector[i]);
         }
-        return target;
-    }
-
-    private Vector3 CollisionAvoidance()
-    {
-        Vector3 target = Vector3.zero;
-
-        CombinedSteeringAgent agent = GetClosestAgent();
-        if (agent == null)
-            return target;
-        
-        
-        
-        
-        float shortestTime = float.PositiveInfinity;
-        CombinedSteeringAgent firstTarget = null;
-        float firstMinSeparation = 0, firstDistance = 0, firstRadius = 0;
-        Vector3 firstRelativePos = Vector3.zero, firstRelativeVel = Vector3.zero;
-        // foreach (CombinedSteeringAgent agent in otherAgents)
-        // {
-            Vector3 relativePos = Position - agent.Position;
-            Vector3 relativeVel = (LookDirection - agent.LookDirection);
-            float distance = relativePos.magnitude;
-            float relativeSpeed = relativeVel.magnitude;
-            if (relativeSpeed == 0)
-                // continue;
-                return target;
-
-            float timeToCollision = -1 * Vector3.Dot(relativePos, relativeVel) / (relativeSpeed * relativeSpeed);
-
-            Vector3 separation = relativePos + relativeVel * timeToCollision;
-            float minSeparation = separation.magnitude;
-
-            if (minSeparation > Radius + agent.Radius)
-                return target;
-                // continue;
-
-            if ((timeToCollision > 0) && (timeToCollision < shortestTime))
-            {
-                shortestTime = timeToCollision;
-                firstTarget = agent;
-                firstMinSeparation = minSeparation;
-                firstDistance = distance;
-                firstRelativePos = relativePos;
-                firstRelativeVel = relativeVel;
-                firstRadius = agent.Radius;
-            }
-        // }
-
-        if (firstTarget == null)
-        {
-            return target;
-        }
-        if (firstMinSeparation <= 0 || firstDistance < Radius + firstRadius)
-        {
-            target = Position - firstTarget.Position;
-        }
-        else
-        {
-            target = firstRelativePos + firstRelativeVel * shortestTime;
-        }
-
         return target;
     }
 }

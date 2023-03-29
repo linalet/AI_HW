@@ -4,12 +4,9 @@ using UnityEngine;
 
 public class WanderingSteeringAgent : AbstractSteeringAgent
 {
-    [SerializeField]
-    private float wanderRate = 4.5f;
-    [SerializeField]
-    private float wanderOffset = 1.5f;
-    [SerializeField]
-    private float wanderRadius = 4f;
+    private float wanderRate = 3f;
+    private float wanderOffset = 2f;
+    private float wanderRadius = 5f;
     private float wanderOrientation = 0f;
     protected override void Awake()
     {
