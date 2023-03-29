@@ -72,9 +72,8 @@ public class CombinedSteeringAgent : AbstractSteeringAgent
         {
             back = true;
         }
-        Vector3 colissionTarget = CollisionAvoidance();
-        Vector3 obstacleTarget = ObstacleAvoidance();
-        
+
+        //path following
         if (Vector3.Distance(points[currentPathNode], Position) < 0.1)
         {
             if (back)
@@ -89,11 +88,14 @@ public class CombinedSteeringAgent : AbstractSteeringAgent
         }
         else
             SetRotationTransition(points[currentPathNode] - Position);
-
-        // final direction
+        
+        // walk around obstacles
+        Vector3 obstacleTarget = ObstacleAvoidance();
         if (obstacleTarget != Vector3.zero)
             SetRotationImmediate(obstacleTarget - Position);
-
+        
+        //avoid collision with other agents
+        Vector3 colissionTarget = CollisionAvoidance();
         if (colissionTarget != Vector3.zero)
             SetRotationTransition(colissionTarget);
 
@@ -168,6 +170,7 @@ public class CombinedSteeringAgent : AbstractSteeringAgent
                 target = hit.point + (hit.normal * avoidDistance);
                 return new Vector3(target.x, 0, target.z);
             }
+            Debug.DrawRay(Position, rayVector[i]);
         }
         return target;
     }
