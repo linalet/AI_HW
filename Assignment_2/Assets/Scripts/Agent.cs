@@ -50,33 +50,34 @@ public class Agent : MonoBehaviour
         // You will need to replace it / change it
 
         var destWorld = parentMaze.GetWorldPositionForMazeTile(GameManager.Instance.DestinationTile);
-        
-        if(destWorld.x > transform.position.x && parentMaze.IsValidTileOfType(new Vector2Int(CurrentTile.x + 1, CurrentTile.y), MazeTileType.Free))
-        {
-            transform.Translate(Vector3.right * movementSpeed * Time.deltaTime);
-        } 
-        else if(destWorld.x < transform.position.x && parentMaze.IsValidTileOfType(new Vector2Int(CurrentTile.x - 1, CurrentTile.y), MazeTileType.Free))
-        {
-            transform.Translate(-Vector3.right * movementSpeed * Time.deltaTime);
-        }
+        AStar(transform.position, destWorld);
 
-        var oldTile = CurrentTile;
-        // Notice on the player's behavior that using this approach, a new tile is computed for a player
-        // as soon as his origin crosses the tile border. Therefore, the player now often stops somehow "in the middle".
-        // For this demo code, it does not really matter but just keep this in mind when dealing with movement.
-        var afterTranslTile = parentMaze.GetMazeTileForWorldPosition(transform.position);
+        // if(destWorld.x > transform.position.x && parentMaze.IsValidTileOfType(new Vector2Int(CurrentTile.x + 1, CurrentTile.y), MazeTileType.Free))
+        // {
+        //     transform.Translate(Vector3.right * movementSpeed * Time.deltaTime);
+        // } 
+        // else if(destWorld.x < transform.position.x && parentMaze.IsValidTileOfType(new Vector2Int(CurrentTile.x - 1, CurrentTile.y), MazeTileType.Free))
+        // {
+        //     transform.Translate(-Vector3.right * movementSpeed * Time.deltaTime);
+        // }
 
-        if(oldTile != afterTranslTile)
-        {
-            parentMaze.SetFreeTileColor(oldTile, Color.red);
-            CurrentTile = afterTranslTile;
-        }
-
-        if(CurrentTile == GameManager.Instance.DestinationTile)
-        {
-            parentMaze.ResetTileColors();
-            Debug.Log("YESSS");
-        }
+        // var oldTile = CurrentTile;
+        // // Notice on the player's behavior that using this approach, a new tile is computed for a player
+        // // as soon as his origin crosses the tile border. Therefore, the player now often stops somehow "in the middle".
+        // // For this demo code, it does not really matter but just keep this in mind when dealing with movement.
+        // var afterTranslTile = parentMaze.GetMazeTileForWorldPosition(transform.position);
+        //
+        // if(oldTile != afterTranslTile)
+        // {
+        //     parentMaze.SetFreeTileColor(oldTile, Color.red);
+        //     CurrentTile = afterTranslTile;
+        // }
+        //
+        // if(CurrentTile == GameManager.Instance.DestinationTile)
+        // {
+        //     parentMaze.ResetTileColors();
+        //     Debug.Log("YESSS");
+        // }
     }
 
     // This function is called every time the user sets a new destination using a left mouse button
@@ -107,6 +108,7 @@ public class Agent : MonoBehaviour
         List<Vector3> closedSet = new List<Vector3>();
         SimplePriorityQueue<Vector3> openSet = new SimplePriorityQueue<Vector3>();
         openSet.Enqueue(start, HeuristicF(start, goal));
+        parentMaze.SetFreeTileColor(parentMaze.GetMazeTileForWorldPosition(start), Color.green);
         Dictionary<Vector3, Vector3> cameFrom = new Dictionary<Vector3, Vector3>();
         Dictionary<Vector3, float> gScore = new Dictionary<Vector3, float>();
 
@@ -124,11 +126,15 @@ public class Agent : MonoBehaviour
             Vector3 current = openSet.Dequeue();
             if (current == goal) return ReconstructPath(cameFrom, current, start);
             closedSet.Add(current);
+            parentMaze.SetFreeTileColor(parentMaze.GetMazeTileForWorldPosition(current), Color.red);
             foreach (Vector3 neighbor in FindNeighbors(current))
             {
                 if (closedSet.Contains(neighbor)) continue;
                 if (!openSet.Contains(neighbor))
+                {
                     openSet.Enqueue(neighbor, gScore[neighbor] + HeuristicF(neighbor, goal));
+                    parentMaze.SetFreeTileColor(parentMaze.GetMazeTileForWorldPosition(neighbor), Color.green);
+                }
                 float tentative_gScore = gScore[current] + HeuristicF(current, neighbor);
                 if (tentative_gScore >= gScore[neighbor]) continue;
                 cameFrom[neighbor] = current;
@@ -164,6 +170,7 @@ public class Agent : MonoBehaviour
                 {
                     current = cameFrom[wp];
                     total_path.Add(current);
+                    parentMaze.SetFreeTileColor(parentMaze.GetMazeTileForWorldPosition(current), Color.blue);
                 }
             }
         }
@@ -176,21 +183,42 @@ public class Agent : MonoBehaviour
     {
         List<Vector3> res = new List<Vector3>();
         var center = parentMaze.GetMazeTileForWorldPosition(tile);
-        int ind = 0;
-        for (int i = -1; i < 2; i++)
+        List<Vector2Int> valid = new List<Vector2Int>();
+        List<Vector2Int> sides = new List<Vector2Int>();
+        sides.Add(new Vector2Int(center.x - 1, center.y));
+        sides.Add(new Vector2Int(center.x + 1, center.y));
+        sides.Add(new Vector2Int(center.x, center.y - 1));
+        sides.Add(new Vector2Int(center.x, center.y + 1));
+        
+        foreach (Vector2Int pos in sides)
         {
-            for (int j = -1; j < 2; j++)
+            if (parentMaze.IsValidTileOfType(pos, MazeTileType.Free))
             {
-                if(i==0 & j==0) continue;
-                var current = new Vector2Int(center.x + i, center.y + j);
-                if (parentMaze.IsValidTileOfType(current, MazeTileType.Free))
-                {
-                    res[ind] = parentMaze.GetWorldPositionForMazeTile(current);
-                    ind++;
-                }
+                res.Add(parentMaze.GetWorldPositionForMazeTile(pos));
             }
         }
+        
+        Vector2Int cur = new Vector2Int(center.x - 1, center.y - 1);
+        if (CheckCorners(cur, new Vector2Int(center.x - 1, center.y), new Vector2Int(center.x, center.y - 1)))
+            res.Add(parentMaze.GetWorldPositionForMazeTile(cur));
+        cur = new Vector2Int(center.x - 1, center.y + 1);
+        if (CheckCorners(cur, new Vector2Int(center.x - 1, center.y), new Vector2Int(center.x, center.y + 1)))
+            res.Add(parentMaze.GetWorldPositionForMazeTile(cur));
+        cur = new Vector2Int(center.x + 1, center.y - 1);
+        if (CheckCorners(cur, new Vector2Int(center.x + 1, center.y), new Vector2Int(center.x, center.y - 1)))
+            res.Add(parentMaze.GetWorldPositionForMazeTile(cur));
+        cur = new Vector2Int(center.x + 1, center.y + 1);
+        if (CheckCorners(cur, new Vector2Int(center.x + 1, center.y), new Vector2Int(center.x, center.y + 1)))
+            res.Add(parentMaze.GetWorldPositionForMazeTile(cur));
+        
         return res;
+    }
+
+    private bool CheckCorners(Vector2Int cur, Vector2Int side1, Vector2Int side2)
+    {
+        return parentMaze.IsValidTileOfType(cur, MazeTileType.Free) &&
+               parentMaze.IsValidTileOfType(side1, MazeTileType.Free) &&
+               parentMaze.IsValidTileOfType(side2, MazeTileType.Free);
     }
 
 }
