@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Audio;
 
-public class GameManager : MonoBehaviour
+public class 
+GameManager : MonoBehaviour
 {
     /// <summary>
     /// Reference to the instance of GameManager class.
@@ -19,6 +20,9 @@ public class GameManager : MonoBehaviour
 
     [SerializeField]
     private GameObject flagPrefab;
+    
+    [SerializeField]
+    public bool euclidH;
 
     [Header("Other settings")]
     [SerializeField]
