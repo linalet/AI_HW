@@ -50,7 +50,11 @@ public class Agent : MonoBehaviour
         // You will need to replace it / change it
 
         var destWorld = parentMaze.GetWorldPositionForMazeTile(GameManager.Instance.DestinationTile);
-        AStar(transform.position, destWorld);
+        if (GameManager.Instance.DestinationTile != CurrentTile)
+            StartCoroutine(AStar(transform.position, destWorld));
+        if (GameManager.Instance.DestinationTile == CurrentTile)
+            StopCoroutine(AStar(transform.position, destWorld));
+        // AStar(transform.position, destWorld);
 
         // if(destWorld.x > transform.position.x && parentMaze.IsValidTileOfType(new Vector2Int(CurrentTile.x + 1, CurrentTile.y), MazeTileType.Free))
         // {
@@ -103,7 +107,7 @@ public class Agent : MonoBehaviour
         isInitialized = true;
     }
 
-    private List<Vector3> AStar(Vector3 start, Vector3 goal)
+    private IEnumerator AStar(Vector3 start, Vector3 goal)
     {
         List<Vector3> closedSet = new List<Vector3>();
         SimplePriorityQueue<Vector3> openSet = new SimplePriorityQueue<Vector3>();
@@ -124,7 +128,13 @@ public class Agent : MonoBehaviour
         while (openSet.Count > 0)
         {
             Vector3 current = openSet.Dequeue();
-            if (current == goal) return ReconstructPath(cameFrom, current, start);
+            if (current == goal)
+            {
+                CurrentTile = parentMaze.GetMazeTileForWorldPosition(current);
+                ReconstructPath(cameFrom, current, start);
+                yield break;
+                // yield return ReconstructPath(cameFrom, current, start);
+            }
             closedSet.Add(current);
             parentMaze.SetFreeTileColor(parentMaze.GetMazeTileForWorldPosition(current), Color.red);
             foreach (Vector3 neighbor in FindNeighbors(current))
@@ -140,10 +150,11 @@ public class Agent : MonoBehaviour
                 cameFrom[neighbor] = current;
                 gScore[neighbor] = tentative_gScore;
                 openSet.UpdatePriority(neighbor, gScore[neighbor] + HeuristicF(neighbor, goal));
+                yield return new WaitForSeconds(0.1f);
             }
         }
     
-        return new List<Vector3>();
+        yield return new List<Vector3>();
     }
 
     private float HeuristicF(Vector3 cur, Vector3 goal)
@@ -162,6 +173,7 @@ public class Agent : MonoBehaviour
     {
         List<Vector3> total_path = new List<Vector3>();
         total_path.Add(current);
+        parentMaze.SetFreeTileColor(parentMaze.GetMazeTileForWorldPosition(current), Color.blue);
         while (current != start)
         {
             foreach (Vector3 wp in cameFrom.Keys)
@@ -219,6 +231,12 @@ public class Agent : MonoBehaviour
         return parentMaze.IsValidTileOfType(cur, MazeTileType.Free) &&
                parentMaze.IsValidTileOfType(side1, MazeTileType.Free) &&
                parentMaze.IsValidTileOfType(side2, MazeTileType.Free);
+    }
+    IEnumerator WaitPls()
+    {
+
+        yield return new WaitForSeconds(1);
+
     }
 
 }
