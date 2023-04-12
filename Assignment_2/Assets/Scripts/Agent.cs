@@ -28,8 +28,7 @@ public class Agent : MonoBehaviour
     protected bool isInitialized = false;
 
     private List<Vector3> shortestPath;
-    private bool running = false;
-    private Coroutine cor;
+    private int tileIndex = 0;
 
     protected virtual void Start()
     {
@@ -53,44 +52,30 @@ public class Agent : MonoBehaviour
         // The code below is just a simple demonstration of some of the functionality / functions
         // You will need to replace it / change it
 
-        var destWorld = parentMaze.GetWorldPositionForMazeTile(GameManager.Instance.DestinationTile);
-        if (GameManager.Instance.DestinationTile != CurrentTile)
+        
+        
+        // var destWorld = parentMaze.GetWorldPositionForMazeTile(GameManager.Instance.DestinationTile);
+        
+        
+        var nextTile = CurrentTile;
+        if (tileIndex < shortestPath.Count)
         {
-            if (!running)
-            {
-                parentMaze.ResetTileColors();
-                cor = StartCoroutine(AStar(parentMaze.GetWorldPositionForMazeTile(CurrentTile), destWorld));
-                running = true;
-            }
             
         }
 
-        // if(destWorld.x > transform.position.x && parentMaze.IsValidTileOfType(new Vector2Int(CurrentTile.x + 1, CurrentTile.y), MazeTileType.Free))
-        // {
-        //     transform.Translate(Vector3.right * movementSpeed * Time.deltaTime);
-        // } 
-        // else if(destWorld.x < transform.position.x && parentMaze.IsValidTileOfType(new Vector2Int(CurrentTile.x - 1, CurrentTile.y), MazeTileType.Free))
-        // {
-        //     transform.Translate(-Vector3.right * movementSpeed * Time.deltaTime);
-        // }
+        FindVector(CurrentTile, );
+        transform.Translate(Vector3.right * movementSpeed * Time.deltaTime);
 
-        // var oldTile = CurrentTile;
-        // // Notice on the player's behavior that using this approach, a new tile is computed for a player
-        // // as soon as his origin crosses the tile border. Therefore, the player now often stops somehow "in the middle".
-        // // For this demo code, it does not really matter but just keep this in mind when dealing with movement.
-        // var afterTranslTile = parentMaze.GetMazeTileForWorldPosition(transform.position);
-        //
-        // if(oldTile != afterTranslTile)
-        // {
-        //     parentMaze.SetFreeTileColor(oldTile, Color.red);
-        //     CurrentTile = afterTranslTile;
-        // }
-        //
-        // if(CurrentTile == GameManager.Instance.DestinationTile)
-        // {
-        //     parentMaze.ResetTileColors();
-        //     Debug.Log("YESSS");
-        // }
+        var oldTile = CurrentTile;
+        // Notice on the player's behavior that using this approach, a new tile is computed for a player
+        // as soon as his origin crosses the tile border. Therefore, the player now often stops somehow "in the middle".
+        // For this demo code, it does not really matter but just keep this in mind when dealing with movement.
+        var afterTranslTile = parentMaze.GetMazeTileForWorldPosition(transform.position);
+        
+        if(oldTile != afterTranslTile)
+        {
+            CurrentTile = afterTranslTile;
+        }
     }
 
     // This function is called every time the user sets a new destination using a left mouse button
@@ -98,6 +83,11 @@ public class Agent : MonoBehaviour
     {
         // TODO Assignment 2 ... this function might be of your interest. :-)
         // The destination tile index is also accessible via GameManager.Instance.DestinationTile
+        parentMaze.ResetTileColors();
+        shortestPath = new List<Vector3>();
+        StartCoroutine(AStar(parentMaze.GetWorldPositionForMazeTile(CurrentTile), 
+                                   parentMaze.GetWorldPositionForMazeTile(GameManager.Instance.DestinationTile)));
+
     }
 
     public virtual void InitializeData(Maze parentMaze, float movementSpeed, Vector2Int spawnTilePos)
@@ -139,9 +129,7 @@ public class Agent : MonoBehaviour
             Vector3 current = openSet.Dequeue();
             if (current == goal)
             {
-                CurrentTile = parentMaze.GetMazeTileForWorldPosition(current);
-                shortestPath = ReconstructPath(cameFrom, current, start);
-                running = false;
+                ReconstructPath(cameFrom, current, start);
                 yield break;
             }
             closedSet.Add(current);
@@ -159,7 +147,7 @@ public class Agent : MonoBehaviour
                 cameFrom[neighbor] = current;
                 gScore[neighbor] = tentative_gScore;
                 openSet.UpdatePriority(neighbor, gScore[neighbor] + HeuristicF(neighbor, goal));
-                yield return new WaitForSeconds(0.2f);
+                yield return new WaitForSeconds(0.15f);
             }
         }
     }
@@ -176,7 +164,7 @@ public class Agent : MonoBehaviour
         return (float)Math.Sqrt(dx * dx + dy * dy);
     }
     
-    private List<Vector3> ReconstructPath(Dictionary<Vector3, Vector3> cameFrom, Vector3 current, Vector3 start)
+    private void ReconstructPath(Dictionary<Vector3, Vector3> cameFrom, Vector3 current, Vector3 start)
     {
         List<Vector3> total_path = new List<Vector3>();
         total_path.Add(current);
@@ -193,11 +181,11 @@ public class Agent : MonoBehaviour
                 }
             }
         }
-    
         total_path.Reverse();
-        return total_path;
+        shortestPath = total_path;
     }
 
+    //this function is so ugly im so so sorry
     private List<Vector3> FindNeighbors(Vector3 tile)
     {
         List<Vector3> res = new List<Vector3>();
@@ -238,11 +226,4 @@ public class Agent : MonoBehaviour
                parentMaze.IsValidTileOfType(side1, MazeTileType.Free) ||
                parentMaze.IsValidTileOfType(side2, MazeTileType.Free));
     }
-    IEnumerator WaitPls()
-    {
-
-        yield return new WaitForSeconds(1);
-
-    }
-
 }
