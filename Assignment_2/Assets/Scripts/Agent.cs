@@ -27,6 +27,10 @@ public class Agent : MonoBehaviour
     protected Maze parentMaze;
     protected bool isInitialized = false;
 
+    private List<Vector3> shortestPath;
+    private bool running = false;
+    private Coroutine cor;
+
     protected virtual void Start()
     {
         GameManager.Instance.DestinationChanged += OnDestinationChanged;
@@ -51,10 +55,15 @@ public class Agent : MonoBehaviour
 
         var destWorld = parentMaze.GetWorldPositionForMazeTile(GameManager.Instance.DestinationTile);
         if (GameManager.Instance.DestinationTile != CurrentTile)
-            StartCoroutine(AStar(transform.position, destWorld));
-        if (GameManager.Instance.DestinationTile == CurrentTile)
-            StopCoroutine(AStar(transform.position, destWorld));
-        // AStar(transform.position, destWorld);
+        {
+            if (!running)
+            {
+                parentMaze.ResetTileColors();
+                cor = StartCoroutine(AStar(parentMaze.GetWorldPositionForMazeTile(CurrentTile), destWorld));
+                running = true;
+            }
+            
+        }
 
         // if(destWorld.x > transform.position.x && parentMaze.IsValidTileOfType(new Vector2Int(CurrentTile.x + 1, CurrentTile.y), MazeTileType.Free))
         // {
@@ -131,9 +140,9 @@ public class Agent : MonoBehaviour
             if (current == goal)
             {
                 CurrentTile = parentMaze.GetMazeTileForWorldPosition(current);
-                ReconstructPath(cameFrom, current, start);
+                shortestPath = ReconstructPath(cameFrom, current, start);
+                running = false;
                 yield break;
-                // yield return ReconstructPath(cameFrom, current, start);
             }
             closedSet.Add(current);
             parentMaze.SetFreeTileColor(parentMaze.GetMazeTileForWorldPosition(current), Color.red);
@@ -150,11 +159,9 @@ public class Agent : MonoBehaviour
                 cameFrom[neighbor] = current;
                 gScore[neighbor] = tentative_gScore;
                 openSet.UpdatePriority(neighbor, gScore[neighbor] + HeuristicF(neighbor, goal));
-                yield return new WaitForSeconds(0.1f);
+                yield return new WaitForSeconds(0.2f);
             }
         }
-    
-        yield return new List<Vector3>();
     }
 
     private float HeuristicF(Vector3 cur, Vector3 goal)
@@ -195,7 +202,6 @@ public class Agent : MonoBehaviour
     {
         List<Vector3> res = new List<Vector3>();
         var center = parentMaze.GetMazeTileForWorldPosition(tile);
-        List<Vector2Int> valid = new List<Vector2Int>();
         List<Vector2Int> sides = new List<Vector2Int>();
         sides.Add(new Vector2Int(center.x - 1, center.y));
         sides.Add(new Vector2Int(center.x + 1, center.y));
@@ -228,9 +234,9 @@ public class Agent : MonoBehaviour
 
     private bool CheckCorners(Vector2Int cur, Vector2Int side1, Vector2Int side2)
     {
-        return parentMaze.IsValidTileOfType(cur, MazeTileType.Free) &&
-               parentMaze.IsValidTileOfType(side1, MazeTileType.Free) &&
-               parentMaze.IsValidTileOfType(side2, MazeTileType.Free);
+        return parentMaze.IsValidTileOfType(cur, MazeTileType.Free) && (
+               parentMaze.IsValidTileOfType(side1, MazeTileType.Free) ||
+               parentMaze.IsValidTileOfType(side2, MazeTileType.Free));
     }
     IEnumerator WaitPls()
     {
