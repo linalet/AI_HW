@@ -29,10 +29,12 @@ public class Agent : MonoBehaviour
 
     private List<Vector3> shortestPath;
     private int tileIndex = 0;
+    private Coroutine astar = null;
 
     protected virtual void Start()
     {
         GameManager.Instance.DestinationChanged += OnDestinationChanged;
+        shortestPath = new List<Vector3>();
     }
 
     protected virtual void Update()
@@ -51,31 +53,27 @@ public class Agent : MonoBehaviour
         // NOTE
         // The code below is just a simple demonstration of some of the functionality / functions
         // You will need to replace it / change it
-
-        
-        
-        // var destWorld = parentMaze.GetWorldPositionForMazeTile(GameManager.Instance.DestinationTile);
-        
-        
-        var nextTile = CurrentTile;
-        if (tileIndex < shortestPath.Count)
+        if (tileIndex < shortestPath.Count && shortestPath.Count!=0)
         {
-            
-        }
-
-        FindVector(CurrentTile, );
-        transform.Translate(Vector3.right * movementSpeed * Time.deltaTime);
-
-        var oldTile = CurrentTile;
-        // Notice on the player's behavior that using this approach, a new tile is computed for a player
-        // as soon as his origin crosses the tile border. Therefore, the player now often stops somehow "in the middle".
-        // For this demo code, it does not really matter but just keep this in mind when dealing with movement.
-        var afterTranslTile = parentMaze.GetMazeTileForWorldPosition(transform.position);
+            var nextTile = shortestPath[tileIndex];
+            var cur = parentMaze.GetWorldPositionForMazeTile(CurrentTile);
+            transform.Translate(new Vector3(nextTile.x-cur.x, nextTile.y-cur.y,0)* movementSpeed * Time.deltaTime);
         
-        if(oldTile != afterTranslTile)
-        {
-            CurrentTile = afterTranslTile;
+            var oldTile = CurrentTile;
+            var afterTranslTile = parentMaze.GetMazeTileForWorldPosition(transform.position);
+
+            if(oldTile != afterTranslTile)
+            {
+                CurrentTile = afterTranslTile;
+            }
+
+            if(CurrentTile == parentMaze.GetMazeTileForWorldPosition(nextTile))
+            {
+                tileIndex++;
+            }
         }
+        
+
     }
 
     // This function is called every time the user sets a new destination using a left mouse button
@@ -83,9 +81,12 @@ public class Agent : MonoBehaviour
     {
         // TODO Assignment 2 ... this function might be of your interest. :-)
         // The destination tile index is also accessible via GameManager.Instance.DestinationTile
+        if (astar != null)
+            StopCoroutine(astar);
+        tileIndex = 0;
         parentMaze.ResetTileColors();
         shortestPath = new List<Vector3>();
-        StartCoroutine(AStar(parentMaze.GetWorldPositionForMazeTile(CurrentTile), 
+        astar = StartCoroutine(AStar(parentMaze.GetWorldPositionForMazeTile(CurrentTile), 
                                    parentMaze.GetWorldPositionForMazeTile(GameManager.Instance.DestinationTile)));
 
     }
@@ -106,6 +107,10 @@ public class Agent : MonoBehaviour
         isInitialized = true;
     }
 
+    private Vector3 FindDirection(Vector3 start, Vector3 goal)
+    {
+        return new Vector3(goal.x-start.x, goal.y-start.y,0);
+    }
     private IEnumerator AStar(Vector3 start, Vector3 goal)
     {
         List<Vector3> closedSet = new List<Vector3>();
