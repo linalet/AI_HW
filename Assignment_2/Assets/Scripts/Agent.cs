@@ -57,7 +57,9 @@ public class Agent : MonoBehaviour
         {
             var nextTile = shortestPath[tileIndex];
             var cur = parentMaze.GetWorldPositionForMazeTile(CurrentTile);
-            transform.Translate(new Vector3(nextTile.x-cur.x, nextTile.y-cur.y,0)* movementSpeed * Time.deltaTime);
+            Vector3 direction = new Vector3(nextTile.x - cur.x, nextTile.y - cur.y, 0);
+            direction.Normalize();
+            transform.Translate(direction* movementSpeed * Time.deltaTime);
         
             var oldTile = CurrentTile;
             var afterTranslTile = parentMaze.GetMazeTileForWorldPosition(transform.position);
@@ -107,10 +109,6 @@ public class Agent : MonoBehaviour
         isInitialized = true;
     }
 
-    private Vector3 FindDirection(Vector3 start, Vector3 goal)
-    {
-        return new Vector3(goal.x-start.x, goal.y-start.y,0);
-    }
     private IEnumerator AStar(Vector3 start, Vector3 goal)
     {
         List<Vector3> closedSet = new List<Vector3>();
@@ -227,8 +225,8 @@ public class Agent : MonoBehaviour
 
     private bool CheckCorners(Vector2Int cur, Vector2Int side1, Vector2Int side2)
     {
-        return parentMaze.IsValidTileOfType(cur, MazeTileType.Free) && (
-               parentMaze.IsValidTileOfType(side1, MazeTileType.Free) ||
-               parentMaze.IsValidTileOfType(side2, MazeTileType.Free));
+        return parentMaze.IsValidTileOfType(cur, MazeTileType.Free) &&
+               parentMaze.IsValidTileOfType(side1, MazeTileType.Free) &&
+               parentMaze.IsValidTileOfType(side2, MazeTileType.Free);
     }
 }
