@@ -60,14 +60,9 @@ public class Agent : MonoBehaviour
             Vector3 direction = new Vector3(nextTile.x - cur.x, nextTile.y - cur.y, 0);
             direction.Normalize();
             transform.Translate(direction* movementSpeed * Time.deltaTime);
-        
-            var oldTile = CurrentTile;
-            var afterTranslTile = parentMaze.GetMazeTileForWorldPosition(transform.position);
-
-            if(oldTile != afterTranslTile)
-            {
-                CurrentTile = afterTranslTile;
-            }
+            
+            if (Vector3.Distance(transform.position, nextTile) < 0.1f)
+                CurrentTile = parentMaze.GetMazeTileForWorldPosition(nextTile);
 
             if(CurrentTile == parentMaze.GetMazeTileForWorldPosition(nextTile))
             {
