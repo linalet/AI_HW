@@ -1,0 +1,4 @@
+RPG pack: base by Kenney Vleugels (www.kenney.nl)
+License: CC0, http://creativecommons.org/publicdomain/zero/1.0/
+(Slightly modified for PA217 course @ FI MUNI)
+

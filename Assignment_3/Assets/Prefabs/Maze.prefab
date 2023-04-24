@@ -1,0 +1,63 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &8434426462973240585
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8434426462973240584}
+  - component: {fileID: 8434426462973240591}
+  m_Layer: 0
+  m_Name: Maze
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8434426462973240584
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8434426462973240585}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8434426462973240591
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8434426462973240585}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e2a3718270a6213448d0edb7b84dec6f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mazeCenter: {x: 0, y: 0}
+  mazeTilePrefab: {fileID: 4638013202130662811, guid: ccfe5c820c26f974791ab27664c2c3d6,
+    type: 3}
+  mazeTileTypes:
+  - type: 0
+    tileSprite: {fileID: -1596969562936065491, guid: 8d20e529fce601b42aa1dff3040b9136,
+      type: 3}
+    tileChar: 35
+  - type: 1
+    tileSprite: {fileID: -2485452196536141730, guid: 8d20e529fce601b42aa1dff3040b9136,
+      type: 3}
+    tileChar: 88
+  - type: 2
+    tileSprite: {fileID: 6183018177996843973, guid: 8d20e529fce601b42aa1dff3040b9136,
+      type: 3}
+    tileChar: 45
+  agentsSpawnChar: 65
+  mazeDefinition: {fileID: 4900000, guid: afd51e789c333414d9d5a05587b6131e, type: 3}

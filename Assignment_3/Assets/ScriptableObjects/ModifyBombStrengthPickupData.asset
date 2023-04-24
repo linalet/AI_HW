@@ -1,0 +1,16 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3610690cb1bf9f24cbb9291aa757bc65, type: 3}
+  m_Name: ModifyBombStrengthPickupData
+  m_EditorClassIdentifier: 
+  sprite: {fileID: -3801914814818322204, guid: aae597bbb53aafd44976cc35663f89c3, type: 3}
+  bombStrengthToAdd: 1
