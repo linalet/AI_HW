@@ -240,7 +240,7 @@ public class Agent : MonoBehaviour
         isInMovementTransition = true;
     }
     
-    private List<Vector2Int> A_Star(Vector2Int start, Vector2Int goal)
+    public List<Vector2Int> A_Star(Vector2Int start, Vector2Int goal)
     {
         List<Vector2Int> closedSet = new List<Vector2Int>();
         SimplePriorityQueue<Vector2Int> openSet = new SimplePriorityQueue<Vector2Int>();

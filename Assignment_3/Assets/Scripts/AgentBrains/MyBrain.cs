@@ -30,7 +30,22 @@ public class MyBrain : AgentBrain
 
     protected override AgentAction[] GetPathTo(Vector2Int destinationTile)
     {
-        // List<Vector3> path = AStar.A_Star(current, destinationTile);
-        return new AgentAction[] { AgentAction.Stay };
+        List<Vector2Int> shortestPath = Agent.A_Star(Agent.CurrentTile, destinationTile);
+        AgentAction[] path = new AgentAction[]{};
+        Vector2Int current = Agent.CurrentTile;
+        foreach (Vector2Int tile in shortestPath)
+        {
+            Vector2Int dir = tile - current;
+            if (dir.x == 0)
+            {
+                path.Append(dir.y < 0 ? AgentAction.MoveUp : AgentAction.MoveDown);
+            }
+            else
+            {
+                path.Append(dir.x < 0 ? AgentAction.MoveLeft : AgentAction.MoveRight);
+            }
+                
+        }
+        return path;
     }
 }
