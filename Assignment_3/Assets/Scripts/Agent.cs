@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Priority_Queue;
 
 public enum AgentAction
 {
@@ -103,6 +104,7 @@ public class Agent : MonoBehaviour
 
     protected AgentBrain brain;
     protected Maze parentMaze;
+    private (int, int) mazeSize;
     protected bool isInitialized = false;
     protected HashSet<Bomb> placedBombs = new HashSet<Bomb>();
 
@@ -147,6 +149,8 @@ public class Agent : MonoBehaviour
         }
 
         this.parentMaze = parentMaze;
+        List<List<MazeTileType>> maze = parentMaze.GetMazeTiles();
+        mazeSize = (maze.Count, maze[0].Count);
 
         // The multiplication below ensures that movement speed is considered in tile-units so it stays
         // consistent across different scales of the maze
@@ -235,4 +239,93 @@ public class Agent : MonoBehaviour
         transitionTarget = parentMaze.GetWorldPositionForMazeTile(tile.x, tile.y);
         isInMovementTransition = true;
     }
+    
+    private List<Vector2Int> A_Star(Vector2Int start, Vector2Int goal)
+    {
+        List<Vector2Int> closedSet = new List<Vector2Int>();
+        SimplePriorityQueue<Vector2Int> openSet = new SimplePriorityQueue<Vector2Int>();
+        openSet.Enqueue(start, EuclidHeuristic(start, goal));
+        Dictionary<Vector2Int, Vector2Int> cameFrom = new Dictionary<Vector2Int, Vector2Int>();
+        Dictionary<Vector2Int, float> gScore = new Dictionary<Vector2Int, float>();
+
+        for (int i = 0; i < mazeSize.Item1; i++)
+        {
+            for (int j = 0; j < mazeSize.Item2; j++)
+            {
+                gScore.Add(new Vector2Int(i,j), Mathf.Infinity);
+            }
+        }
+        gScore[start] = 0;
+        
+        while (openSet.Count > 0)
+        {
+            Vector2Int current = openSet.Dequeue();
+            if (current == goal)
+            {
+                return ReconstructPath(cameFrom, current, start);
+            }
+            closedSet.Add(current);
+            foreach (Vector2Int neighbor in FindNeighbors(current))
+            {
+                if (closedSet.Contains(neighbor)) continue;
+                if (!openSet.Contains(neighbor))
+                {
+                    openSet.Enqueue(neighbor, gScore[neighbor] + EuclidHeuristic(neighbor, goal));
+                }
+                float tentative_gScore = gScore[current] + EuclidHeuristic(current, neighbor);
+                if (tentative_gScore >= gScore[neighbor]) continue;
+                cameFrom[neighbor] = current;
+                gScore[neighbor] = tentative_gScore;
+                openSet.UpdatePriority(neighbor, gScore[neighbor] + EuclidHeuristic(neighbor, goal));
+            }
+        }
+        return new List<Vector2Int>();
+    }
+    private float EuclidHeuristic(Vector2Int cur, Vector2Int goal)
+    {
+        //TODO Vector2Int na Vector3
+        var dx = (cur.x - goal.x);
+        var dy = (cur.y - goal.y);
+        return (float)Mathf.Sqrt(dx * dx + dy * dy);
+    }
+    
+    private List<Vector2Int> ReconstructPath(Dictionary<Vector2Int, Vector2Int> cameFrom, Vector2Int current, Vector2Int start)
+    {
+        List<Vector2Int> total_path = new List<Vector2Int>();
+        total_path.Add(current);
+        while (current != start)
+        {
+            foreach (Vector2Int wp in cameFrom.Keys)
+            {
+                if (wp == current)
+                {
+                    current = cameFrom[wp];
+                    total_path.Add(current);
+                }
+            }
+        }
+        total_path.Reverse();
+        return total_path;
+    }
+
+    private List<Vector2Int> FindNeighbors(Vector2Int tile)
+    {
+        List<Vector2Int> res = new List<Vector2Int>();
+        List<Vector2Int> sides = new List<Vector2Int>();
+        sides.Add(new Vector2Int(tile.x - 1, tile.y));
+        sides.Add(new Vector2Int(tile.x + 1, tile.y));
+        sides.Add(new Vector2Int(tile.x, tile.y - 1));
+        sides.Add(new Vector2Int(tile.x, tile.y + 1));
+        
+        foreach (Vector2Int pos in sides)
+        {
+            if (parentMaze.IsValidTileOfType(pos, MazeTileType.Free))
+            {
+                res.Add(pos);
+            }
+        }
+        
+        return res;
+    }
+    
 }
