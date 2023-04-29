@@ -11,30 +11,8 @@ public class AStar : MonoBehaviour
     protected float movementSpeed;
     protected Maze parentMaze;
     protected bool isInitialized = false;
-    private int tileIndex = 0;
 
-    protected virtual void Update()
-    {
-        if (tileIndex < shortestPath.Count && shortestPath.Count!=0)
-        {
-            var nextTile = shortestPath[tileIndex];
-            var cur = parentMaze.GetWorldPositionForMazeTile(CurrentTile);
-            Vector3 direction = new Vector3(nextTile.x - cur.x, nextTile.y - cur.y, 0);
-            direction.Normalize();
-            transform.Translate(direction* movementSpeed * Time.deltaTime);
-            
-            if (Vector3.Distance(transform.position, nextTile) < 0.1f)
-                CurrentTile = parentMaze.GetMazeTileForWorldPosition(nextTile);
-
-            if(CurrentTile == parentMaze.GetMazeTileForWorldPosition(nextTile))
-            {
-                tileIndex++;
-            }
-        }
-        
-
-    }
-    private IEnumerator A_Star(Vector3 start, Vector3 goal)
+    private List<Vector3> A_Star(Vector3 start, Vector3 goal)
     {
         List<Vector3> closedSet = new List<Vector3>();
         SimplePriorityQueue<Vector3> openSet = new SimplePriorityQueue<Vector3>();
@@ -73,6 +51,7 @@ public class AStar : MonoBehaviour
                 openSet.UpdatePriority(neighbor, gScore[neighbor] + EuclidHeuristic(neighbor, goal));
             }
         }
+        return new List<Vector3>();
     }
     private float EuclidHeuristic(Vector3 cur, Vector3 goal)
     {

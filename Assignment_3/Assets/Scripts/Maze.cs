@@ -41,7 +41,8 @@ public class Maze : MonoBehaviour
     /// Maze tiles are stored in row-major order
     /// First index is thus row/y, second indices are columns/x
     /// </summary>
-    protected List<List<MazeTileType>> MazeTiles { get; private set; }
+    public List<List<MazeTileType>> MazeTiles { get; private set; }
+    // rotected List<List<MazeTileType>> MazeTiles { get; private set; }
 
     public List<Vector2Int> AgentsSpawnTilePositions { get; private set; }
         = new List<Vector2Int>();
